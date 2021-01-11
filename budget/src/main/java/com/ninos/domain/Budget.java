@@ -1,5 +1,10 @@
 package com.ninos.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerator;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,7 +20,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
 @Entity
-public class Budget
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+public class Budget implements Comparable<Budget>
 {
     private Long id;
     private String name;
@@ -39,17 +45,21 @@ public class Budget
     {
         this.name = name;
     }
+
     @ManyToMany
     @JoinTable(inverseJoinColumns=@JoinColumn(name="user_id"), joinColumns=@JoinColumn(name="budget_id"))
-    public Set<User> getUser()
+    @JsonIgnore
+    public Set<User> getUsers()
     {
         return users;
     }
-    public void setUser(Set<User> users)
+
+    public void setUsers(Set<User> users)
     {
         this.users = users;
     }
     @OneToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="budget")
+    @JsonIgnore
     public Set<Group> getGroups()
     {
         return groups;
@@ -57,5 +67,10 @@ public class Budget
     public void setGroups(Set<Group> groups)
     {
         this.groups = groups;
+    }
+
+    @Override
+    public int compareTo(Budget budget) {
+        return this.id.compareTo(budget.getId());
     }
 }

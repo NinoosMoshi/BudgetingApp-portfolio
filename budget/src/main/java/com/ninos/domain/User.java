@@ -1,5 +1,8 @@
 package com.ninos.domain;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
@@ -8,11 +11,13 @@ import javax.persistence.*;
 
 @Entity
 @Table(name="users")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class User
 {
     private Long id;
     private String username;
     private String password;
+    private String confirmPassword;
     private Set<Budget> budgets = new TreeSet<>();
     private Set<Authority> authorities = new HashSet<>();
 
@@ -43,11 +48,12 @@ public class User
         this.password = password;
     }
 
-    @ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="user")
+    @ManyToMany(cascade=CascadeType.ALL, fetch=FetchType.LAZY, mappedBy="users")
     public Set<Budget> getBudgets()
     {
         return budgets;
     }
+
     public void setBudgets(Set<Budget> budgets)
     {
         this.budgets = budgets;
@@ -61,5 +67,14 @@ public class User
 
     public void setAuthorities(Set<Authority> authorities) {
         this.authorities = authorities;
+    }
+
+    @Transient
+    public String getConfirmPassword() {
+        return confirmPassword;
+    }
+
+    public void setConfirmPassword(String confirmPassword) {
+        this.confirmPassword = confirmPassword;
     }
 }
